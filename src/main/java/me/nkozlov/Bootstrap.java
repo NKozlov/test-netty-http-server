@@ -4,7 +4,7 @@
  */
 package me.nkozlov;
 
-import me.nkozlov.console.listener.ConsoleEventListener;
+import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -28,17 +28,14 @@ public class Bootstrap {
             throw new RuntimeException(e);
         }
 
-        Thread threadConsoleListener = new Thread((ConsoleEventListener) applicationContext.getBean("consoleEventListener"));
+        //        create thread for console
+        Thread threadConsoleListener = applicationContext.getBean("threadConsoleListener", Thread.class);
+        threadConsoleListener.setName("ConsoleListener Thread");
+        /*ThreadFactory threadFactory = Executors.privilegedThreadFactory();
+                threadFactory.newThread();*/
+        //        add applicationContext to  applicationContextProvider
+        applicationContext.getBean("applicationContextProvider", ApplicationContextProvider.class).setApplicationContext(applicationContext);
 
         threadConsoleListener.start();
-
-        //        for debugging
-        try {
-            threadConsoleListener.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        //        end
-
     }
 }

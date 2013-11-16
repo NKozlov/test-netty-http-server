@@ -5,7 +5,33 @@
         >
     <context:annotation-config/>
 
+    <!-- =========================================================================================== -->
+    <!-- Console beans -->
+    <!-- =========================================================================================== -->
+
     <bean name="consoleEventHandler" class="me.nkozlov.console.ConsoleEventHandler"/>
     <bean name="consoleEventListener" class="me.nkozlov.console.listener.ConsoleEventListener"/>
+
+    <!-- =========================================================================================== -->
+    <!-- Netty beans -->
+    <!-- =========================================================================================== -->
+
+    <bean name="nettyServer" class="me.nkozlov.server.NettyServer"/>
+
+    <!-- =========================================================================================== -->
+    <!-- Threads beans -->
+    <!-- =========================================================================================== -->
+
+    <bean name="threadConsoleListener" class="java.lang.Thread" scope="prototype">
+        <constructor-arg index="0" ref="consoleEventListener"/>
+    </bean>
+
+    <bean name="threadNettyServer" class="java.lang.Thread" scope="prototype">
+        <constructor-arg index="0" ref="nettyServer"/>
+    </bean>
+    <!-- =========================================================================================== -->
+    <!-- Utils beans -->
+    <!-- =========================================================================================== -->
+    <bean id="applicationContextProvider" class="me.nkozlov.utilz.appcontext.ApplicationContextProvider"/>
 
 </beans>

@@ -22,15 +22,16 @@ public class ConsoleEventListener implements Runnable {
     public void run() {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
+        boolean exitFlag = false;
 
-        while (!line.equalsIgnoreCase("quit")) {
+        while (!exitFlag) {
             try {
                 System.out.print(">");
                 line = in.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            consoleEventHandler.processEvent(line);
+            exitFlag = consoleEventHandler.processEvent(line);
         }
 
         try {
