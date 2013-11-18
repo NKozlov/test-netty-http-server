@@ -20,7 +20,7 @@ public class ApplicationContextProvider implements ApplicationContextAware {
         applicationContext = ctx;
     }
 
-    public ApplicationContext getApplicationContext() {
+    public static ApplicationContext getApplicationContext() {
         return applicationContext;
     }
 }

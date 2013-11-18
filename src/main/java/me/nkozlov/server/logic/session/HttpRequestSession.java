@@ -4,20 +4,30 @@
  */
 package me.nkozlov.server.logic.session;
 
-import me.nkozlov.server.logic.packet.Packet;
+import io.netty.channel.Channel;
+import me.nkozlov.server.logic.packet.HttpRequestPacket;
 
 /**
  * @author Kozlov Nikita
  */
-public class HttpRequestSession extends Session {
+public class HttpRequestSession {
 
-    private Packet packet;
+    private HttpRequestPacket packet;
+    private Channel channel;
 
-    public Packet getPacket() {
+    public HttpRequestPacket getPacket() {
         return packet;
     }
 
-    public void setPacket(Packet packet) {
+    public void setPacket(HttpRequestPacket packet) {
         this.packet = packet;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 }

@@ -7,7 +7,7 @@ package me.nkozlov.server.logic.packet;
 /**
  * @author Kozlov Nikita
  */
-public class HttpPacket extends Packet {
+public class HttpRequestPacket {
 
     private Object msg;
 

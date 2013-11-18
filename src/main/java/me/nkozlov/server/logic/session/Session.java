@@ -8,6 +8,7 @@ import io.netty.channel.Channel;
 
 /**
  * @author Kozlov Nikita
+ *         not used yet
  */
 public abstract class Session {
 

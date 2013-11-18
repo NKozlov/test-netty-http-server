@@ -19,6 +19,16 @@
     <bean name="nettyServer" class="me.nkozlov.server.NettyServer"/>
 
     <!-- =========================================================================================== -->
+    <!-- Netty beans -->
+    <!-- =========================================================================================== -->
+
+    <bean name="readQueueHandler" class="me.nkozlov.server.logic.ReadQueueHandler">
+        <constructor-arg index="0" value="1"/>
+    </bean>
+
+    <bean name="serverResources" class="me.nkozlov.server.ServerResources"/>
+
+    <!-- =========================================================================================== -->
     <!-- Threads beans -->
     <!-- =========================================================================================== -->
 

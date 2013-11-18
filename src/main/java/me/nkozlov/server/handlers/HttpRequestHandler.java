@@ -7,8 +7,13 @@ package me.nkozlov.server.handlers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import me.nkozlov.server.ServerResources;
+import me.nkozlov.server.logic.packet.HttpRequestPacket;
+import me.nkozlov.server.logic.session.HttpRequestSession;
+import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Kozlov Nikita
@@ -16,8 +21,6 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
-
-
 
     /*@Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
@@ -34,6 +37,14 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         logger.debug("Context: {}; http message: {}", ctx, msg);
 
         DefaultFullHttpRequest defaultFullHttpRequest = (DefaultFullHttpRequest) msg;
+        HttpRequestPacket packet = new HttpRequestPacket();
+
+        HttpRequestSession session = new HttpRequestSession();
+        session.setChannel(ctx.channel());
+        session.setPacket(packet);
+
+        logger.debug("readQueueHandler = {}", ServerResources.getReadQueueHandler());
+        ServerResources.getReadQueueHandler().addSessionToProcess(session);
     }
 
     @Override
@@ -56,5 +67,13 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         // Close the connection when an exception is raised.
         cause.printStackTrace();
         ctx.close();
+    }
+
+    // ===================================================================================================================
+    // = Implementation
+    // ===================================================================================================================
+
+    private ApplicationContext getApplicationContext() {
+        return ApplicationContextProvider.getApplicationContext();
     }
 }
