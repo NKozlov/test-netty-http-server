@@ -4,6 +4,8 @@
  */
 package me.nkozlov;
 
+import me.nkozlov.server.ServerResources;
+import me.nkozlov.server.logic.ReadQueueHandler;
 import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,15 @@ public class Bootstrap {
         //        create thread for console
         Thread threadConsoleListener = applicationContext.getBean("threadConsoleListener", Thread.class);
         threadConsoleListener.setName("ConsoleListener Thread");
+
         /*ThreadFactory threadFactory = Executors.privilegedThreadFactory();
                 threadFactory.newThread();*/
         //        add applicationContext to  applicationContextProvider
+
+//        инициализация
         applicationContext.getBean("applicationContextProvider", ApplicationContextProvider.class).setApplicationContext(applicationContext);
+        applicationContext.getBean("serverResources", ServerResources.class).setReadQueueHandler(applicationContext.getBean("readQueueHandler",
+                ReadQueueHandler.class));
 
         threadConsoleListener.start();
     }

@@ -9,10 +9,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.*;
 import me.nkozlov.server.logic.packet.HttpRequestPacket;
 import me.nkozlov.server.logic.session.HttpRequestSession;
 import org.slf4j.Logger;
@@ -26,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Kozlov Nikita
+ *         todo надо сделать конструктор без старта потоков, чтобы потоки стартовать только при инициализации сервера
  */
 public final class ReadQueueHandler implements Runnable {
 
@@ -64,8 +62,33 @@ public final class ReadQueueHandler implements Runnable {
                 Channel channel = session.getChannel();
 
                 ByteBuf byteBuf = Unpooled.copiedBuffer("Hello World!", Charset.forName("UTF-8"));
+                //                logger debug level
+                if (logger.isDebugEnabled()) {
+                    String stringByteBuf = "";
+                    while (byteBuf.isReadable()) {
+                        stringByteBuf = stringByteBuf + (char) byteBuf.readByte();
+                    }
+                    logger.debug("set content http response ByteBuf = {}", stringByteBuf);
+                    byteBuf = byteBuf.resetReaderIndex();
+                }
 
                 DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, byteBuf);
+
+                //                logger debug level
+                if (logger.isDebugEnabled()) {
+                    String stringByteBuf = "";
+                    while (response.content().isReadable()) {
+                        stringByteBuf = stringByteBuf + (char) response.content().readByte();
+                    }
+                    logger.debug("get content http response ByteBuf = {}", stringByteBuf);
+                    response.content().resetReaderIndex();
+                }
+                HttpHeaders httpHeaders = response.headers();
+//                 todo задать хедеры
+//                response.headers().set(HttpHeaders.Names.CONTENT_TYPE)
+                logger.debug("response: header = {}", response.headers());
+
+
 
                 logger.debug("DefaultFullHttpResponse: {}", response);
                 channel.write(response).addListener(new ChannelFutureListener() {
