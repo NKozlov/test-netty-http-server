@@ -7,7 +7,6 @@ package me.nkozlov.server.logic;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.*;
 import me.nkozlov.server.logic.packet.HttpRequestPacket;
@@ -83,19 +82,20 @@ public final class ReadQueueHandler implements Runnable {
                     logger.debug("get content http response ByteBuf = {}", stringByteBuf);
                     response.content().resetReaderIndex();
                 }
-                HttpHeaders httpHeaders = response.headers();
-//                 todo задать хедеры
-//                response.headers().set(HttpHeaders.Names.CONTENT_TYPE)
-                logger.debug("response: header = {}", response.headers());
+                //                set http header
+                response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
+                response.headers().set(HttpHeaders.Names.CONTENT_ENCODING, HttpHeaders.Values.GZIP);
+                response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
 
-
-
-                logger.debug("DefaultFullHttpResponse: {}", response);
-                channel.write(response).addListener(new ChannelFutureListener() {
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        future.channel().close();
-                    }
-                });
+                if (!session.isKeepAlive()) {
+                    logger.debug("DefaultFullHttpResponse: {}", response);
+                    channel.write(response).addListener(ChannelFutureListener.CLOSE);
+                } else {
+                    response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+                    logger.debug("DefaultFullHttpResponse: {}", response);
+                    channel.write(response);
+                }
+                channel.flush();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

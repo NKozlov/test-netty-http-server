@@ -14,6 +14,7 @@ public class HttpRequestSession {
 
     private HttpRequestPacket packet;
     private Channel channel;
+    private boolean keepAlive;
 
     public HttpRequestPacket getPacket() {
         return packet;
@@ -29,5 +30,13 @@ public class HttpRequestSession {
 
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
     }
 }
