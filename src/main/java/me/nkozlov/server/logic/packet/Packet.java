@@ -6,7 +6,7 @@ package me.nkozlov.server.logic.packet;
 
 /**
  * @author Kozlov Nikita
- *         not used yet
+ *         todo      not used yet
  */
 public abstract class Packet {
 

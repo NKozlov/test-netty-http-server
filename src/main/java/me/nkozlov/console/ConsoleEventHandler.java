@@ -38,7 +38,7 @@ public class ConsoleEventHandler {
                 stopCommand();
                 return false;
             default:
-                return true;
+                return false;
         }
     }
 
