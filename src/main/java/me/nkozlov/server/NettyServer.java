@@ -59,7 +59,8 @@ public class NettyServer implements Runnable {
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 300)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 50);
 
             // Bind and start to accept incoming connections.
 
