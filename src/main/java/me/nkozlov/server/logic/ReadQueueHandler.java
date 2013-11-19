@@ -84,7 +84,7 @@ public final class ReadQueueHandler implements Runnable {
                 }
                 //                set http header
                 response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-                response.headers().set(HttpHeaders.Names.CONTENT_ENCODING, HttpHeaders.Values.GZIP);
+                //                response.headers().set(HttpHeaders.Names.CONTENT_ENCODING, HttpHeaders.Values.GZIP);
                 response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
 
                 if (!session.isKeepAlive()) {
