@@ -5,7 +5,7 @@
 package me.nkozlov;
 
 import me.nkozlov.server.ServerResources;
-import me.nkozlov.server.logic.ReadQueueHandler;
+import me.nkozlov.server.logic.packet.HttpPacketReadQueueHandler;
 import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class Bootstrap {
 //        инициализация
         applicationContext.getBean("applicationContextProvider", ApplicationContextProvider.class).setApplicationContext(applicationContext);
         applicationContext.getBean("serverResources", ServerResources.class).setReadQueueHandler(applicationContext.getBean("readQueueHandler",
-                ReadQueueHandler.class));
+                HttpPacketReadQueueHandler.class));
 
         threadConsoleListener.start();
     }

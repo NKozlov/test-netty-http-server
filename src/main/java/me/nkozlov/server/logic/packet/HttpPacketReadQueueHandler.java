@@ -2,13 +2,14 @@
  * Copyright (c) 2013
  * Kozlov Nikita
  */
-package me.nkozlov.server.logic;
+package me.nkozlov.server.logic.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.*;
+import me.nkozlov.server.logic.AbstractReadQueue;
 import me.nkozlov.server.logic.packet.HttpRequestPacket;
 import me.nkozlov.server.logic.session.HttpRequestSession;
 import org.slf4j.Logger;
@@ -24,34 +25,18 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Kozlov Nikita
  *         todo надо сделать конструктор без старта потоков, чтобы потоки стартовать только при инициализации сервера
  */
-public final class ReadQueueHandler implements Runnable {
+public final class HttpPacketReadQueueHandler extends AbstractReadQueue<HttpRequestSession> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReadQueueHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpPacketReadQueueHandler.class);
 
-    private final BlockingQueue<HttpRequestSession> sessionQueue;
-    private final ExecutorService threadPool;
-    private int threadPoolSize;
-
-    public ReadQueueHandler(int threadPoolSize) {
-        this.threadPoolSize = threadPoolSize;
-        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
-        this.sessionQueue = new LinkedBlockingQueue<>();
-
-        initThreadPool();
-    }
-
-    // добавление сесси в очередь на обработку
-    public void addSessionToProcess(HttpRequestSession session) {
-        if (session != null) {
-            logger.debug("addSessionToProcess({})", session);
-            this.sessionQueue.add(session);
-        }
+    public HttpPacketReadQueueHandler(int threadPoolSize) {
+        super(threadPoolSize);
     }
 
     @Override
     public void run() {
-
-        while (true) {
+        logger.debug("{} START.", Thread.currentThread().getName());
+        while (!threadPool.isShutdown()) {
             try {
                 HttpRequestSession session = this.sessionQueue.take();
 
@@ -84,7 +69,6 @@ public final class ReadQueueHandler implements Runnable {
                 }
                 //                set http header
                 response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-                //                response.headers().set(HttpHeaders.Names.CONTENT_ENCODING, HttpHeaders.Values.GZIP);
                 response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
 
                 if (!session.isKeepAlive()) {
@@ -99,16 +83,6 @@ public final class ReadQueueHandler implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
-
-    private void initThreadPool() {
-        for (int i = 0; i < this.threadPoolSize; i++) {
-            this.threadPool.execute(this);
         }
     }
 }

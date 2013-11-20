@@ -4,7 +4,7 @@
  */
 package me.nkozlov.server;
 
-import me.nkozlov.server.logic.ReadQueueHandler;
+import me.nkozlov.server.logic.packet.HttpPacketReadQueueHandler;
 
 /**
  * @author Kozlov Nikita
@@ -12,13 +12,13 @@ import me.nkozlov.server.logic.ReadQueueHandler;
 public class ServerResources {
 
 
-    private static ReadQueueHandler readQueueHandler;
+    private static HttpPacketReadQueueHandler httpPacketReadQueueHandler;
 
-    public void setReadQueueHandler(ReadQueueHandler readQueueHandler) {
-        ServerResources.readQueueHandler = readQueueHandler;
+    public void setReadQueueHandler(HttpPacketReadQueueHandler httpPacketReadQueueHandler) {
+        ServerResources.httpPacketReadQueueHandler = httpPacketReadQueueHandler;
     }
 
-    public static ReadQueueHandler getReadQueueHandler() {
-        return readQueueHandler;
+    public static HttpPacketReadQueueHandler getHttpPacketReadQueueHandler() {
+        return httpPacketReadQueueHandler;
     }
 }

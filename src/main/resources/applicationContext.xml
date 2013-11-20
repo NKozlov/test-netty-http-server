@@ -22,7 +22,7 @@
     <!-- Netty beans -->
     <!-- =========================================================================================== -->
 
-    <bean name="readQueueHandler" class="me.nkozlov.server.logic.ReadQueueHandler">
+    <bean name="readQueueHandler" class="me.nkozlov.server.logic.packet.HttpPacketReadQueueHandler">
         <constructor-arg index="0" value="1"/>
     </bean>
 

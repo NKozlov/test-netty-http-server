@@ -56,8 +56,8 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             session.setPacket(packet);
             session.setKeepAlive(keepAlive);
 
-            logger.debug("readQueueHandler = {}", ServerResources.getReadQueueHandler());
-            ServerResources.getReadQueueHandler().addSessionToProcess(session);
+            logger.debug("readQueueHandler = {}", ServerResources.getHttpPacketReadQueueHandler());
+            ServerResources.getHttpPacketReadQueueHandler().addTaskToQueue(session);
         }
     }
 
