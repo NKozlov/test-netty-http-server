@@ -2,65 +2,56 @@
  * Copyright (c) 2013
  * Kozlov Nikita
  */
-package me.nkozlov.server.logic;
+package me.nkozlov.server.logic.session;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.*;
-import me.nkozlov.server.logic.packet.HttpRequestPacket;
-import me.nkozlov.server.logic.session.HttpRequestSession;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import me.nkozlov.server.ServerResources;
+import me.nkozlov.server.logic.AbstractReadQueue;
+import me.nkozlov.server.logic.LogicHandler;
+import me.nkozlov.server.logic.NaturalSeqLogicHandler;
+import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Kozlov Nikita
- *         todo надо сделать конструктор без старта потоков, чтобы потоки стартовать только при инициализации сервера
+ *         todo переместить файл в пакет ession, переименовать класс в HttpRequestSession
  */
-public final class ReadQueueHandler implements Runnable {
+public final class HttpSessionReadQueueHandler extends AbstractReadQueue<HttpRequestSession> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReadQueueHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSessionReadQueueHandler.class);
 
-    private final BlockingQueue<HttpRequestSession> sessionQueue;
-    private final ExecutorService threadPool;
-    private int threadPoolSize;
-
-    public ReadQueueHandler(int threadPoolSize) {
-        this.threadPoolSize = threadPoolSize;
-        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
-        this.sessionQueue = new LinkedBlockingQueue<>();
-
-        initThreadPool();
-    }
-
-    // добавление сесси в очередь на обработку
-    public void addSessionToProcess(HttpRequestSession session) {
-        if (session != null) {
-            logger.debug("addSessionToProcess({})", session);
-            this.sessionQueue.add(session);
-        }
+    public HttpSessionReadQueueHandler(int threadPoolSize) {
+        super(threadPoolSize);
     }
 
     @Override
     public void run() {
-
-        while (true) {
+        logger.debug("{} START.", Thread.currentThread().getName());
+        LogicHandler logicHandler = ApplicationContextProvider.getApplicationContext().getBean("naturalSeqLogicHandler", NaturalSeqLogicHandler.class);
+        while (!threadPool.isShutdown()) {
             try {
                 HttpRequestSession session = this.sessionQueue.take();
 
-                HttpRequestPacket packet = session.getPacket();
-
-                DefaultFullHttpRequest msg = (DefaultFullHttpRequest) packet.getMsg();
                 Channel channel = session.getChannel();
+                //                обрабатываем логику (возвращаем следующее число из последовательности)
+                Integer contentValue = (Integer) logicHandler.executeLogic();
+                logger.debug("[{}]: contentValue = {}", Thread.currentThread().getName(), contentValue);
 
-                ByteBuf byteBuf = Unpooled.copiedBuffer("Hello World!", Charset.forName("UTF-8"));
+                //ставим полученное число в очередь на запись в файл
+                ServerResources.getFileReadQueueHandler().addTaskToQueue(contentValue);
+
+                //                формируем ответный пакет
+                ByteBuf byteBuf = Unpooled.copiedBuffer(contentValue.toString(), Charset.forName("UTF-8"));
                 //                logger debug level
                 if (logger.isDebugEnabled()) {
                     String stringByteBuf = "";
@@ -84,7 +75,6 @@ public final class ReadQueueHandler implements Runnable {
                 }
                 //                set http header
                 response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-                //                response.headers().set(HttpHeaders.Names.CONTENT_ENCODING, HttpHeaders.Values.GZIP);
                 response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
 
                 if (!session.isKeepAlive()) {
@@ -97,18 +87,8 @@ public final class ReadQueueHandler implements Runnable {
                 }
                 channel.flush();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("[{}]: interrupted! e.getMessage = {}", Thread.currentThread().getName(), e.getMessage());
             }
-        }
-    }
-
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
-
-    private void initThreadPool() {
-        for (int i = 0; i < this.threadPoolSize; i++) {
-            this.threadPool.execute(this);
         }
     }
 }

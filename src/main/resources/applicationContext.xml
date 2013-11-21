@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
         >
     <context:annotation-config/>
+
+    <!-- =========================================================================================== -->
+    <!-- Config -->
+    <!-- =========================================================================================== -->
+
+    <util:properties id="fileConfigProps" location="classpath:file/file-settings.properties"/>
 
     <!-- =========================================================================================== -->
     <!-- Console beans -->
@@ -18,27 +25,43 @@
 
     <bean name="nettyServer" class="me.nkozlov.server.NettyServer"/>
 
+    <bean name="serverResources" class="me.nkozlov.server.ServerResources"/>
+
     <!-- =========================================================================================== -->
-    <!-- Netty beans -->
+    <!-- Logic beans -->
     <!-- =========================================================================================== -->
 
-    <bean name="readQueueHandler" class="me.nkozlov.server.logic.ReadQueueHandler">
-        <constructor-arg index="0" value="1"/>
+    <bean name="sqNumNatureFileFactory" class="me.nkozlov.server.logic.file.FileFactory">
+        <constructor-arg index="0" ref="fileConfigProps"/>
     </bean>
 
-    <bean name="serverResources" class="me.nkozlov.server.ServerResources"/>
+    <bean name="naturalSeqLogicHandler" class="me.nkozlov.server.logic.NaturalSeqLogicHandler">
+        <constructor-arg index="0" ref="sqNumNatureFileFactory"/>
+    </bean>
+
+    <bean name="fileExecutor" class="me.nkozlov.server.logic.file.FileExecutor"/>
+
+    <!-- =========================================================================================== -->
+    <!-- Admin Interface beans -->
+    <!-- =========================================================================================== -->
+
+    <bean name="nettyServerAdmin" class="me.nkozlov.server.admin.NettyServerAdmin"/>
+
+    <bean name="fileReadQueueAdmin" class="me.nkozlov.server.admin.FileReadQueueAdmin"/>
+
+    <bean name="sessionReadQueueAdmin" class="me.nkozlov.server.admin.SessionReadQueueAdmin"/>
 
     <!-- =========================================================================================== -->
     <!-- Threads beans -->
     <!-- =========================================================================================== -->
 
-    <bean name="threadConsoleListener" class="java.lang.Thread" scope="prototype">
+    <!--<bean name="threadConsoleListener" class="java.lang.Thread" scope="prototype">
         <constructor-arg index="0" ref="consoleEventListener"/>
     </bean>
 
     <bean name="threadNettyServer" class="java.lang.Thread" scope="prototype">
         <constructor-arg index="0" ref="nettyServer"/>
-    </bean>
+    </bean>-->
     <!-- =========================================================================================== -->
     <!-- Utils beans -->
     <!-- =========================================================================================== -->
