@@ -5,15 +5,11 @@
 package me.nkozlov.server.logic.file;
 
 import me.nkozlov.server.logic.AbstractReadQueue;
+import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -27,31 +23,29 @@ public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
         super(threadPoolSize);
     }
 
-    public ExecutorService getThreadPool(){
+    public ExecutorService getThreadPool() {
         return threadPool;
     }
 
     @Override
     public void run() {
-        logger.debug("{} START.", Thread.currentThread().getName());
-        Path file = FileSystems.getDefault().getPath("src/main/resources", "example.txt");
-        logger.debug("path to file = {}", file);
-        try {
-            Files.createFile(file);
-            logger.info("File {} was create.", file);
-        } catch (IOException e) {
-            logger.info("File named {} already exists", file);
-        }
+        logger.debug("[{}] FileReadQueueHandler.run() START.", Thread.currentThread().getName());
+        //        Получаем из IoC-контейнера объект bean name = fileExecutor
+        FileExecutor fileExecutor = ApplicationContextProvider.getApplicationContext().getBean("fileExecutor", FileExecutor.class);
 
-        for (int i = 0; i < 4; i++) {
-            logger.trace("Loop i = {}", i);
-            Charset charset = Charset.forName("UTF-8");
-            String s = "example " + i;
-
-            try (BufferedWriter writer = Files.newBufferedWriter(file, charset)) {
-                writer.write(s, 0, s.length());
-            } catch (IOException x) {
-                System.err.format("IOException: %s%n", x);
+        while (!threadPool.isShutdown()) {
+            try {
+                Integer content = this.sessionQueue.take();
+                logger.trace("FileReadQueueHandler.run() start sessionQueue handle.");
+                //                this.sessionQueue.isEmpty();
+                try {
+                    //                    thread-safe write
+                    fileExecutor.writeToFile(content.toString());
+                } catch (IOException e) {
+                    logger.error("[{}]: FileReadQueueHandler. {}", Thread.currentThread().getName(), e.getMessage());
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -4,8 +4,7 @@
  */
 package me.nkozlov;
 
-import me.nkozlov.server.ServerResources;
-import me.nkozlov.server.logic.packet.HttpPacketReadQueueHandler;
+import me.nkozlov.console.listener.ConsoleEventListener;
 import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +13,24 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
+ * Main-класс, который инициализирует основные ресурсы, в том числе и Console Listener (в отдельном потоке с именем "ConsoleListener Thread"). <br/>
+ * Так же инициализируется applicationContext, который сохраняется в классе {@link ApplicationContextProvider}.
+ * Класс является точкой входа в приложение. Содержит метод {@link Bootstrap#main(String[])}.
+ *
  * @author Kozlov Nikita
+ * @see me.nkozlov.console.listener.ConsoleEventListener
+ * @see me.nkozlov.console.ConsoleEventHandler
+ * @see ApplicationContextProvider
  */
 public class Bootstrap {
 
     private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 
+    /**
+     * Основной метод, с которого начинается выполнение проложения.
+     *
+     * @see Bootstrap
+     */
     public static void main(String[] args) {
         ApplicationContext applicationContext;
         try {
@@ -30,18 +41,15 @@ public class Bootstrap {
             throw new RuntimeException(e);
         }
 
-        //        create thread for console
-        Thread threadConsoleListener = applicationContext.getBean("threadConsoleListener", Thread.class);
+        // создаем поток для Console Listener
+        ConsoleEventListener consoleEventListener = applicationContext.getBean("consoleEventListener", ConsoleEventListener.class);
+        Thread threadConsoleListener = new Thread(consoleEventListener);
         threadConsoleListener.setName("ConsoleListener Thread");
 
-        /*ThreadFactory threadFactory = Executors.privilegedThreadFactory();
-                threadFactory.newThread();*/
-        //        add applicationContext to  applicationContextProvider
-
-//        инициализация
+        //  сохраняем applicationContext в  статическом поле класса  ApplicationContextProvider
         applicationContext.getBean("applicationContextProvider", ApplicationContextProvider.class).setApplicationContext(applicationContext);
-        applicationContext.getBean("serverResources", ServerResources.class).setReadQueueHandler(applicationContext.getBean("readQueueHandler",
-                HttpPacketReadQueueHandler.class));
+        /*applicationContext.getBean("serverResources", ServerResources.class).setReadQueueHandler(applicationContext.getBean("readQueueHandler",
+                HttpSessionReadQueueHandler.class));*/
 
         threadConsoleListener.start();
     }

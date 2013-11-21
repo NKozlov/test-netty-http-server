@@ -34,6 +34,13 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!--Spring Core-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
         <!--Logger dependencies-->
         <dependency>
             <groupId>org.slf4j</groupId>

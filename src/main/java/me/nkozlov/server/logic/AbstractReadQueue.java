@@ -4,7 +4,7 @@
  */
 package me.nkozlov.server.logic;
 
-import me.nkozlov.server.logic.packet.HttpPacketReadQueueHandler;
+import me.nkozlov.server.logic.session.HttpSessionReadQueueHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 abstract public class AbstractReadQueue<E> implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpPacketReadQueueHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSessionReadQueueHandler.class);
 
     protected final BlockingQueue<E> sessionQueue;
     protected final ExecutorService threadPool;
@@ -37,6 +37,10 @@ abstract public class AbstractReadQueue<E> implements Runnable {
             logger.debug("addSessionToProcess({})", task);
             this.sessionQueue.add(task);
         }
+    }
+
+    public BlockingQueue<E> getSessionQueue() {
+        return this.sessionQueue;
     }
 
     protected void initThreadPool() {

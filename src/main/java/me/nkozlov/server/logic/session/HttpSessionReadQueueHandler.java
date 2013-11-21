@@ -2,50 +2,56 @@
  * Copyright (c) 2013
  * Kozlov Nikita
  */
-package me.nkozlov.server.logic.packet;
+package me.nkozlov.server.logic.session;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import me.nkozlov.server.ServerResources;
 import me.nkozlov.server.logic.AbstractReadQueue;
-import me.nkozlov.server.logic.packet.HttpRequestPacket;
-import me.nkozlov.server.logic.session.HttpRequestSession;
+import me.nkozlov.server.logic.LogicHandler;
+import me.nkozlov.server.logic.NaturalSeqLogicHandler;
+import me.nkozlov.utilz.appcontext.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Kozlov Nikita
- *         todo надо сделать конструктор без старта потоков, чтобы потоки стартовать только при инициализации сервера
+ *         todo переместить файл в пакет ession, переименовать класс в HttpRequestSession
  */
-public final class HttpPacketReadQueueHandler extends AbstractReadQueue<HttpRequestSession> {
+public final class HttpSessionReadQueueHandler extends AbstractReadQueue<HttpRequestSession> {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpPacketReadQueueHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSessionReadQueueHandler.class);
 
-    public HttpPacketReadQueueHandler(int threadPoolSize) {
+    public HttpSessionReadQueueHandler(int threadPoolSize) {
         super(threadPoolSize);
     }
 
     @Override
     public void run() {
         logger.debug("{} START.", Thread.currentThread().getName());
+        LogicHandler logicHandler = ApplicationContextProvider.getApplicationContext().getBean("naturalSeqLogicHandler", NaturalSeqLogicHandler.class);
         while (!threadPool.isShutdown()) {
             try {
                 HttpRequestSession session = this.sessionQueue.take();
 
-                HttpRequestPacket packet = session.getPacket();
-
-                DefaultFullHttpRequest msg = (DefaultFullHttpRequest) packet.getMsg();
                 Channel channel = session.getChannel();
+                //                обрабатываем логику (возвращаем следующее число из последовательности)
+                Integer contentValue = (Integer) logicHandler.executeLogic();
+                logger.debug("[{}]: contentValue = {}", Thread.currentThread().getName(), contentValue);
 
-                ByteBuf byteBuf = Unpooled.copiedBuffer("Hello World!", Charset.forName("UTF-8"));
+                //ставим полученное число в очередь на запись в файл
+                ServerResources.getFileReadQueueHandler().addTaskToQueue(contentValue);
+
+                //                формируем ответный пакет
+                ByteBuf byteBuf = Unpooled.copiedBuffer(contentValue.toString(), Charset.forName("UTF-8"));
                 //                logger debug level
                 if (logger.isDebugEnabled()) {
                     String stringByteBuf = "";
@@ -81,7 +87,7 @@ public final class HttpPacketReadQueueHandler extends AbstractReadQueue<HttpRequ
                 }
                 channel.flush();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("[{}]: interrupted! e.getMessage = {}", Thread.currentThread().getName(), e.getMessage());
             }
         }
     }
