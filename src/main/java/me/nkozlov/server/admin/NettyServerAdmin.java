@@ -33,23 +33,35 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Se
      */
     @Override
     public void start() {
-        logger.debug("start()");
-        fileReadQueueAdmin.start();
-        sessionReadQueueAdmin.start();
+        if (!this.nettyServer.isStarted()) {
+            logger.debug("start()");
+            fileReadQueueAdmin.start();
+            sessionReadQueueAdmin.start();
 
-        //        Создание отдельного потока для исполнения сервера
-        Thread threadNetty = new Thread(nettyServer);
-        threadNetty.setName("NettyServer Thread");
+            //        Создание отдельного потока для исполнения сервера
+            Thread threadNetty = new Thread(nettyServer);
+            threadNetty.setName("NettyServer Thread");
 
-        threadNetty.start();
+            threadNetty.start();
+            logger.info("NettyServer was started.");
+            this.nettyServer.setStarted(true);
+        } else {
+            logger.info("NettyServer is already running.");
+        }
     }
 
     @Override
     public void stop() {
-        nettyServer.getChannelFuture().channel().close();
-        nettyServer.getChannelFuture().awaitUninterruptibly();
+        if (this.nettyServer.isStarted()) {
+            nettyServer.getChannelFuture().channel().close();
+            nettyServer.getChannelFuture().awaitUninterruptibly();
 
-        sessionReadQueueAdmin.stop();
-        fileReadQueueAdmin.stop();
+            sessionReadQueueAdmin.stop();
+            fileReadQueueAdmin.stop();
+            this.nettyServer.setStarted(false);
+            logger.info("NettyServer was stopped");
+        } else {
+            logger.info("NettyServer is not running, and can not be stopped.");
+        }
     }
 }

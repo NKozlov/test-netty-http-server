@@ -52,6 +52,11 @@ public class ConsoleEventHandler {
                 return false;
             case (COMMAND_STOP):
                 nettyServerAdmin.stop();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    //                    nothing
+                }
                 return false;
             default:
                 return false;
@@ -65,19 +70,4 @@ public class ConsoleEventHandler {
     private String parseCommand(String command) {
         return command.trim().toLowerCase();
     }
-
-    // todo Удалить
-   /* private void startCommand() {
-        Thread threadNetty = new Thread(nettyServer);
-        threadNetty.setName("NettyServer Thread");
-        this.threadNettyServer = threadNetty;
-        threadNetty.start();
-    }
-
-    private void stopCommand() {
-        //send thread interrupt
-
-        nettyServer.getChannelFuture().channel().close();
-        nettyServer.getChannelFuture().awaitUninterruptibly();
-    }*/
 }

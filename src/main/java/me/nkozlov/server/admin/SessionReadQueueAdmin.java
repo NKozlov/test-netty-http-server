@@ -25,9 +25,13 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
     //    todo добавить возможность конфигурирования кол-ва потоков из *.properties файла.
     @Override
     public void start() {
-        this.sessionReadQueueHandler = new HttpSessionReadQueueHandler(2);
-        //        добавляем в ServerResources ссылку на обработчик очереди
-        this.serverResources.httpSessionReadQueueHandler(this.sessionReadQueueHandler);
+        if (this.sessionReadQueueHandler == null) {
+            this.sessionReadQueueHandler = new HttpSessionReadQueueHandler(2);
+            //        добавляем в ServerResources ссылку на обработчик очереди
+            this.serverResources.httpSessionReadQueueHandler(this.sessionReadQueueHandler);
+        } else {
+            logger.info("sessionReadQueueHandler is already running");
+        }
     }
 
     @Override
@@ -41,5 +45,7 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
             logger.error("{}", e.getMessage());
             throw new RuntimeException(e);
         }
+
+        sessionReadQueueHandler = null;
     }
 }

@@ -27,9 +27,11 @@ public class NettyServer implements Runnable {
 
     private volatile ChannelFuture channelFuture;
     private int port;
+    private boolean isStarted;
 
     public NettyServer() {
         this.port = 80;
+        this.isStarted = false;
     }
 
     public ChannelFuture getChannelFuture() {
@@ -42,6 +44,15 @@ public class NettyServer implements Runnable {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    public void setStarted(boolean started) {
+        isStarted = started;
     }
 
     public void run() {

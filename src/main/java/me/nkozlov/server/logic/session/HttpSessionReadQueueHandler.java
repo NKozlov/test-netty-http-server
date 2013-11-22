@@ -48,7 +48,21 @@ public final class HttpSessionReadQueueHandler extends AbstractReadQueue<HttpReq
                 logger.debug("[{}]: contentValue = {}", Thread.currentThread().getName(), contentValue);
 
                 //ставим полученное число в очередь на запись в файл
-                ServerResources.getFileReadQueueHandler().addTaskToQueue(contentValue);
+                try {
+                    ServerResources.getFileReadQueueHandler().addTaskToQueue(contentValue);
+                } catch (Exception e) {
+
+                    logger.error("Task was not add to FileReadQueueHandler");
+                    Thread.sleep(100);
+                    DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                            Unpooled.copiedBuffer("500 Internal Server Error", Charset.forName("UTF-8")));
+                    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
+                    response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
+
+                    channel.write(response).addListener(ChannelFutureListener.CLOSE);
+                    channel.flush();
+                    continue;
+                }
 
                 //                формируем ответный пакет
                 ByteBuf byteBuf = Unpooled.copiedBuffer(contentValue.toString(), Charset.forName("UTF-8"));

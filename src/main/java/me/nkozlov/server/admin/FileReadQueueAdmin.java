@@ -25,10 +25,14 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
     //    todo добавить возможность конфигурирования кол-ва потоков из *.properties файла.
     @Override
     public void start() {
-        this.fileReadQueueHandler = new FileReadQueueHandler(1);
+        if (this.fileReadQueueHandler == null) {
+            this.fileReadQueueHandler = new FileReadQueueHandler(1);
 
-        //        добавляем в ServerResources ссылку на обработчик очереди
-        this.serverResources.setFileReadQueueHandler(this.fileReadQueueHandler);
+            //        добавляем в ServerResources ссылку на обработчик очереди
+            this.serverResources.setFileReadQueueHandler(this.fileReadQueueHandler);
+        } else {
+            logger.info("fileReadQueueHandler is already running");
+        }
     }
 
     @Override
@@ -42,5 +46,7 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
             logger.error("{}", e.getMessage());
             throw new RuntimeException(e);
         }
+
+        fileReadQueueHandler = null;
     }
 }
