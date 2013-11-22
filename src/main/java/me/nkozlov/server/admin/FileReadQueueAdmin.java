@@ -5,12 +5,17 @@
 package me.nkozlov.server.admin;
 
 import me.nkozlov.server.logic.file.FileReadQueueHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * todo Document type FileReadQueueAdmin
  */
 public class FileReadQueueAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileReadQueueAdmin.class);
     private FileReadQueueHandler fileReadQueueHandler;
 
     /**
@@ -28,5 +33,14 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
 
     @Override
     public void stop() {
+        fileReadQueueHandler.getThreadPool().shutdown();
+        try {
+            if (!fileReadQueueHandler.getThreadPool().awaitTermination(5, TimeUnit.SECONDS)) {
+                fileReadQueueHandler.getThreadPool().shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            logger.error("{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

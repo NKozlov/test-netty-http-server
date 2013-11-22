@@ -5,12 +5,17 @@
 package me.nkozlov.server.admin;
 
 import me.nkozlov.server.logic.session.HttpSessionReadQueueHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * todo Document type SessionReadQueueAdmin
  */
 public class SessionReadQueueAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
 
+    private static final Logger logger = LoggerFactory.getLogger(SessionReadQueueAdmin.class);
     private HttpSessionReadQueueHandler sessionReadQueueHandler;
 
     /**
@@ -27,5 +32,14 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
 
     @Override
     public void stop() {
+        sessionReadQueueHandler.getThreadPool().shutdown();
+        try {
+            if (!sessionReadQueueHandler.getThreadPool().awaitTermination(5, TimeUnit.SECONDS)) {
+                sessionReadQueueHandler.getThreadPool().shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            logger.error("{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

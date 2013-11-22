@@ -33,7 +33,11 @@ public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
         //        Получаем из IoC-контейнера объект bean name = fileExecutor
         FileExecutor fileExecutor = ApplicationContextProvider.getApplicationContext().getBean("fileExecutor", FileExecutor.class);
 
-        while (!threadPool.isShutdown()) {
+        while (true) {
+            if (threadPool.isShutdown() && this.sessionQueue.isEmpty()) {
+                logger.info("FileReadQueueHandler can now shutdown properly, because the tasks in the queue anymore.");
+                break;
+            }
             try {
                 Integer content = this.sessionQueue.take();
                 logger.trace("FileReadQueueHandler.run() start sessionQueue handle.");
@@ -42,11 +46,13 @@ public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
                     //                    thread-safe write
                     fileExecutor.writeToFile(content.toString());
                 } catch (IOException e) {
-                    logger.error("[{}]: FileReadQueueHandler. {}", Thread.currentThread().getName(), e.getMessage());
+                    logger.error("[{}]: FileReadQueueHandler. e.getMessage() = {}", Thread.currentThread().getName(), e.getMessage());
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("[{}]: FileReadQueueHandler.", Thread.currentThread().getName());
+                logger.info("FileReadQueueHandler must complete the processing queue.");
             }
         }
+        logger.info("FileReadQueueHandler has successfully completed.");
     }
 }

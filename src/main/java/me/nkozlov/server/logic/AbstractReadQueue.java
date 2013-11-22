@@ -39,8 +39,8 @@ abstract public class AbstractReadQueue<E> implements Runnable {
         }
     }
 
-    public BlockingQueue<E> getSessionQueue() {
-        return this.sessionQueue;
+    public ExecutorService getThreadPool() {
+        return threadPool;
     }
 
     protected void initThreadPool() {

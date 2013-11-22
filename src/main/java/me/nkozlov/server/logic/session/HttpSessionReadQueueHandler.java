@@ -87,8 +87,10 @@ public final class HttpSessionReadQueueHandler extends AbstractReadQueue<HttpReq
                 }
                 channel.flush();
             } catch (InterruptedException e) {
-                logger.info("[{}]: interrupted! e.getMessage = {}", Thread.currentThread().getName(), e.getMessage());
+                logger.info("[{}]: interrupted!", Thread.currentThread().getName());
             }
         }
+
+        logger.info("HttpSessionReadQueueHandler has successfully completed.");
     }
 }

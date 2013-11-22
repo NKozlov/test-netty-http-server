@@ -46,5 +46,10 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Se
 
     @Override
     public void stop() {
+        nettyServer.getChannelFuture().channel().close();
+        nettyServer.getChannelFuture().awaitUninterruptibly();
+
+        sessionReadQueueAdmin.stop();
+        fileReadQueueAdmin.stop();
     }
 }
