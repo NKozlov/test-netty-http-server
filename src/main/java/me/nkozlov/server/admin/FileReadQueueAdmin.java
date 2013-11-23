@@ -31,11 +31,14 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
      * Запуск слушателя и обработчика {@link FileReadQueueHandler} очереди.
      * Один поток.
      */
-    //    todo добавить возможность конфигурирования кол-ва потоков из *.properties файла.
     @Override
     public void start() {
         if (this.fileReadQueueHandler == null) {
-            this.fileReadQueueHandler = new FileReadQueueHandler(1);
+
+            //инициализация параметров (из файла config/netty-server-config.properties)
+            short fileQueueHandlerCount = Short.parseShort(this.nettyConfig.getProperty("queue.handler.file.thread.count"));
+
+            this.fileReadQueueHandler = new FileReadQueueHandler(fileQueueHandlerCount);
 
             //        добавляем в ServerResources ссылку на обработчик очереди
             this.serverResources.setFileReadQueueHandler(this.fileReadQueueHandler);

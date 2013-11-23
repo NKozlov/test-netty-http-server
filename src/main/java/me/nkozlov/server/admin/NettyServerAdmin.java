@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see FileReadQueueAdmin
  * @see SessionReadQueueAdmin
  * @see ServerAdminInterface
+ * @see NettyServerAdminInterface
  */
 public class NettyServerAdmin extends AbstractServerAdminInterface implements NettyServerAdminInterface {
 
@@ -48,6 +49,16 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
             logger.debug("start()");
             fileReadQueueAdmin.start();
             sessionReadQueueAdmin.start();
+
+            //инициализация параметров для запуска сервера (из файла config/netty-server-config.properties)
+            int port = Integer.parseInt(this.nettyConfig.getProperty("netty.server.port"));
+            this.nettyServer.setPort(port);
+
+            short bossThreadCount = Short.parseShort(this.nettyConfig.getProperty("netty.server.boss.thread.count"));
+            this.nettyServer.setBossThreadCount(bossThreadCount);
+
+            short childThreadCount = Short.parseShort(this.nettyConfig.getProperty("netty.server.child.thread.count"));
+            this.nettyServer.setChildThreadCount(childThreadCount);
 
             //        Создание отдельного потока для исполнения сервера
             Thread threadNetty = new Thread(nettyServer);

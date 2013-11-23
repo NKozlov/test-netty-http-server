@@ -7,6 +7,8 @@ package me.nkozlov.server.admin;
 import me.nkozlov.server.ServerResources;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Properties;
+
 /**
  * Общие поля и методы для реализаций интерфейса {@link ServerAdminInterface}.
  *
@@ -20,4 +22,7 @@ abstract public class AbstractServerAdminInterface implements ServerAdminInterfa
 
     @Autowired
     protected ServerResources serverResources;
+
+    @Autowired
+    protected Properties nettyConfig;
 }

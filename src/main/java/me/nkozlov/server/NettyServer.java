@@ -38,10 +38,11 @@ public class NettyServer implements Runnable {
 
     private volatile ChannelFuture channelFuture;
     private int port;
+    private short bossThreadCount;
+    private short childThreadCount;
     private boolean isStarted;
 
     public NettyServer() {
-        this.port = 80;
         this.isStarted = false;
     }
 
@@ -64,6 +65,40 @@ public class NettyServer implements Runnable {
      */
     public void setPort(int port) {
         this.port = port;
+    }
+
+    /**
+     * Возвращает кол-во потоков, которые используются для обработки событий {@link SocketChannel}
+     *
+     * @return bossThreadCount
+     */
+    public short getBossThreadCount() {
+        return bossThreadCount;
+    }
+
+    /**
+     * Устанавливает кол-во потоков для обработки событий на {@link SocketChannel}
+     *
+     * @param bossThreadCount - кол-во потоков для обработки.
+     */
+    public void setBossThreadCount(short bossThreadCount) {
+        this.bossThreadCount = bossThreadCount;
+    }
+
+    /**
+     * Возвращает кол-во потоков,которые используются для обработки событий {@link io.netty.channel.Channel}'s.
+     *
+     * @return childThreadCount
+     */
+    public short getChildThreadCount() {
+        return childThreadCount;
+    }
+
+    /**
+     * Устанавливает кол-во потоков для обработки событий на {@link io.netty.channel.Channel}'s.
+     */
+    public void setChildThreadCount(short childThreadCount) {
+        this.childThreadCount = childThreadCount;
     }
 
     /**
@@ -93,8 +128,8 @@ public class NettyServer implements Runnable {
     // synchronized(nettyServerAdmin)
     @Override
     public void run() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+        EventLoopGroup bossGroup = new NioEventLoopGroup(this.bossThreadCount);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(this.childThreadCount);
         try {
             ServerBootstrap networkServer = new ServerBootstrap();
             networkServer.group(bossGroup, workerGroup)

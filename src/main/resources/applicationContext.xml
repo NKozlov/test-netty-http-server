@@ -11,6 +11,7 @@
     <!-- =========================================================================================== -->
 
     <util:properties id="fileConfigProps" location="classpath:file/file-settings.properties"/>
+    <util:properties id="nettyConfig" location="classpath:config/netty-server-config.properties"/>
 
     <!-- =========================================================================================== -->
     <!-- Console beans -->
@@ -51,17 +52,6 @@
 
     <bean name="sessionReadQueueAdmin" class="me.nkozlov.server.admin.SessionReadQueueAdmin"/>
 
-    <!-- =========================================================================================== -->
-    <!-- Threads beans -->
-    <!-- =========================================================================================== -->
-
-    <!--<bean name="threadConsoleListener" class="java.lang.Thread" scope="prototype">
-        <constructor-arg index="0" ref="consoleEventListener"/>
-    </bean>
-
-    <bean name="threadNettyServer" class="java.lang.Thread" scope="prototype">
-        <constructor-arg index="0" ref="nettyServer"/>
-    </bean>-->
     <!-- =========================================================================================== -->
     <!-- Utils beans -->
     <!-- =========================================================================================== -->

@@ -28,11 +28,13 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
      * Запуск слушателя и обработчика {@link HttpSessionReadQueueHandler} очереди.
      * Два потока.
      */
-    //    todo добавить возможность конфигурирования кол-ва потоков из *.properties файла.
     @Override
     public void start() {
         if (this.sessionReadQueueHandler == null) {
-            this.sessionReadQueueHandler = new HttpSessionReadQueueHandler(2);
+            //инициализация параметров (из файла config/netty-server-config.properties)
+            short httpSessionHandlerCount = Short.parseShort(this.nettyConfig.getProperty("queue.handler.http.session.thread.count"));
+
+            this.sessionReadQueueHandler = new HttpSessionReadQueueHandler(httpSessionHandlerCount);
             //        добавляем в ServerResources ссылку на обработчик очереди
             this.serverResources.setHttpSessionReadQueueHandler(this.sessionReadQueueHandler);
         } else {
