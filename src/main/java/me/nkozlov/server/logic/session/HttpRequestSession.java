@@ -5,24 +5,14 @@
 package me.nkozlov.server.logic.session;
 
 import io.netty.channel.Channel;
-import me.nkozlov.server.logic.packet.HttpRequestPacket;
 
 /**
  * @author Kozlov Nikita
  */
 public class HttpRequestSession {
 
-    private HttpRequestPacket packet;
     private Channel channel;
     private boolean keepAlive;
-
-    public HttpRequestPacket getPacket() {
-        return packet;
-    }
-
-    public void setPacket(HttpRequestPacket packet) {
-        this.packet = packet;
-    }
 
     public Channel getChannel() {
         return channel;

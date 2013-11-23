@@ -10,10 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 
 /**
+ * Обработчик очереди задач на запись в файл контента. Запуск и остановка данного обработчика происходит в {@link me.nkozlov.server.admin.FileReadQueueAdmin}.
+ * Очередь, которая обрабатывается, находится внутри объекта.
+ *
  * @author Kozlov Nikita
+ * @see me.nkozlov.server.admin.FileReadQueueAdmin
+ * @see AbstractReadQueue
  */
 public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
 
@@ -23,17 +27,19 @@ public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
         super(threadPoolSize);
     }
 
-    public ExecutorService getThreadPool() {
-        return threadPool;
-    }
-
     @Override
     public void run() {
         logger.debug("[{}] FileReadQueueHandler.run() START.", Thread.currentThread().getName());
-        //        Получаем из IoC-контейнера объект bean name = fileExecutor
+
+        //        Получаем из IoC-контейнера объект bean name = fileExecutor, для записи в файл
         FileExecutor fileExecutor = ApplicationContextProvider.getApplicationContext().getBean("fileExecutor", FileExecutor.class);
 
         while (true) {
+           /* условия выхода из цикла, логируется в файл.
+           проверяется флаг shutdown и обязательно пуста ли очередь с задачами.
+           Все задачи, которые хранятся в очереди обязательно должны быть записаны в файл, только после этого можно
+           завершить работу.
+              */
             if (threadPool.isShutdown() && this.sessionQueue.isEmpty()) {
                 logger.info("FileReadQueueHandler can now shutdown properly, because the tasks in the queue anymore.");
                 break;
@@ -41,16 +47,18 @@ public final class FileReadQueueHandler extends AbstractReadQueue<Integer> {
             try {
                 Integer content = this.sessionQueue.take();
                 logger.trace("FileReadQueueHandler.run() start sessionQueue handle.");
-                //                this.sessionQueue.isEmpty();
+
                 try {
-                    //                    thread-safe write
+                    //  thread-safe write
                     fileExecutor.writeToFile(content.toString());
                 } catch (IOException e) {
                     logger.error("[{}]: FileReadQueueHandler. e.getMessage() = {}", Thread.currentThread().getName(), e.getMessage());
                 }
             } catch (InterruptedException e) {
                 logger.info("[{}]: FileReadQueueHandler.", Thread.currentThread().getName());
-                logger.info("FileReadQueueHandler must complete the processing queue.");
+                if (!this.sessionQueue.isEmpty()) {
+                    logger.info("FileReadQueueHandler must complete the processing queue.");
+                }
             }
         }
         logger.info("FileReadQueueHandler has successfully completed.");

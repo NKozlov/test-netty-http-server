@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * Формирует ряд натуральных положительных чисел. Thread-safe операции. Инициализируется в IoC-контейнере.
+ *
  * @author Kozlov Nikita
+ * @see LogicHandler
  */
 public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
 
@@ -40,6 +43,9 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
     // = Implementation
     // ===================================================================================================================
 
+    /**
+     * Инциализирует начальное значение из файла.
+     */
     private void doInit() {
         BufferedReader bufferedReader = null;
         String content = "";

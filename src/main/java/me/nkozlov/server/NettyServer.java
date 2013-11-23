@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Реализация запуска непосредственно netty-сервера, а так же его корректного завершения.
+ * Стандартный порт = 80. Сохраняет ссылку на {@link ChannelFuture}, который создается при запуске сервера, для возможности его завершения из вне.
+ * Инициализируется в IoC-контейнере.
+ *
  * @author Kozlov Nikita
  */
 public class NettyServer implements Runnable {
@@ -34,27 +38,52 @@ public class NettyServer implements Runnable {
         this.isStarted = false;
     }
 
+    /**
+     * @return Возвращает ссылку на {@link ChannelFuture} с помощью которого можно будет завершить работу сервера.
+     */
     public ChannelFuture getChannelFuture() {
         return channelFuture;
     }
 
+    /**
+     * @return Возвращает порт, который "слушает" сервер. Тип int.
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * @param port номер порта, на котором будет запущен сервер.
+     */
     public void setPort(int port) {
         this.port = port;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @return Возвращает статус работы сервера:
+     *         <ul>
+     *         <li><u>true</u> - запущен. </li>
+     *         <li><u>false</u> - не запущен.</li>
+     *         </ul>
+     */
     public boolean isStarted() {
         return isStarted;
     }
 
+    /**
+     * Устанавливает флаг работы сервера.
+     *
+     * @param started флаг работы сервера:
+     *                <ul>
+     *                <li><u>true</u> - запущен. </li>
+     *                <li><u>false</u> - не запущен.</li>
+     *                </ul>
+     */
     public void setStarted(boolean started) {
         isStarted = started;
     }
 
+    @Override
     public void run() {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup(4);

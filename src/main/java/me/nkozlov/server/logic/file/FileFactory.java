@@ -17,6 +17,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 /**
+ * При инициализации создает нужный файл, если он не создан. Затем возвращает {@link BufferedReader} и {@link BufferedWriter
+ * } при необходимости. Инициализируется в IoC-контейнере.
+ *
  * @author Kozlov Nikita
  */
 public class FileFactory {
@@ -26,18 +29,33 @@ public class FileFactory {
     private Charset charset;
     private Path filePath;
 
+    /**
+     * Конструктор, на входе ждет из IoC-контейнера (при инициализации) Properties, где написан путь к файлу
+     * с которым по умолчанию будет работать объект этого класса.
+     */
     public FileFactory(Properties fileConfigProps) {
         this.doInit(fileConfigProps);
     }
 
+    /**
+     * Конструктор, который позволяет указать путь до файла.
+     */
     public FileFactory(String strPath, String fileName) {
         this.doInit(strPath, fileName);
     }
 
+    /**
+     * Возвращает {@link BufferedWriter} для работы с текущим файлом.
+     * По умолчанию текущий файл задается в file-settings.properties.
+     */
     public BufferedWriter getBufferedWriter() throws IOException {
         return Files.newBufferedWriter(this.filePath, this.charset);
     }
 
+    /**
+     * Возвращает {@link BufferedReader} для работы с текущим файлом.
+     * По умолчанию текущий файл задается в file-settings.properties.
+     */
     public BufferedReader getBufferedReader() throws IOException {
         return Files.newBufferedReader(this.filePath, this.charset);
     }

@@ -10,7 +10,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import me.nkozlov.server.ServerResources;
-import me.nkozlov.server.logic.packet.HttpRequestPacket;
 import me.nkozlov.server.logic.session.HttpRequestSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,10 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 
 /**
+ * Главный обработчик http запросов. Следует в pipeline после {@link HttpServerCodec} и {@link HttpObjectAggregator}.
+ *
  * @author Kozlov Nikita
+ * @see me.nkozlov.server.NettyServer
  */
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
@@ -30,32 +32,26 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-    }
-
-    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.debug("Context: {}; http message: {}", ctx, msg);
 
+        // проверяем, что сообщение действительно HttpRequest
         if (msg instanceof HttpRequest) {
             HttpRequest req = (HttpRequest) msg;
 
             if (HttpHeaders.is100ContinueExpected(req)) {
                 ctx.write(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
             }
-
+            //фильтруем запрос от клиента на /favicon.ico от браузера (тестировалось на Google Chrome)
             if (req.getUri().equalsIgnoreCase("/favicon.ico")) {
                 ctx.write(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK));
                 ctx.flush();
             } else {
 
                 boolean keepAlive = HttpHeaders.isKeepAlive(req);
-                HttpRequestPacket packet = new HttpRequestPacket();
-
+                // создаем объект сессии для текущего подключения и ставим на обработку в очередь.
                 HttpRequestSession session = new HttpRequestSession();
                 session.setChannel(ctx.channel());
-                session.setPacket(packet);
                 session.setKeepAlive(keepAlive);
 
                 logger.debug("readQueueHandler = {}", ServerResources.getHttpSessionReadQueueHandler());

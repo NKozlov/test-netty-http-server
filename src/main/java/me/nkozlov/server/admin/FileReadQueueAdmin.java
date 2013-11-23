@@ -11,7 +11,12 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * todo Document type FileReadQueueAdmin
+ * Основной контроллер, который запускает и останавливает очередь {@link FileReadQueueHandler}.
+ * Инициализируется в IoC-контейнере.
+ *
+ * @author Kozlov Nikita
+ * @see FileReadQueueHandler
+ * @see ServerAdminInterface
  */
 public class FileReadQueueAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
 
@@ -35,6 +40,9 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
         }
     }
 
+    /**
+     * Завершение работы слушателя и обработчика {@link FileReadQueueHandler} очереди.
+     */
     @Override
     public void stop() {
         fileReadQueueHandler.getThreadPool().shutdown();
@@ -48,5 +56,6 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
         }
 
         fileReadQueueHandler = null;
+        this.serverResources.setFileReadQueueHandler(null);
     }
 }

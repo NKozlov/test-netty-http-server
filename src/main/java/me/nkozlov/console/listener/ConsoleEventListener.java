@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
  *
  * @author Kozlov Nikita
  * @see ConsoleEventHandler
+ * @see me.nkozlov.Bootstrap
  */
 public class ConsoleEventListener implements Runnable {
 

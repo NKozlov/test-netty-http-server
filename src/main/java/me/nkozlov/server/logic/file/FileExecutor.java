@@ -12,6 +12,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 /**
+ * Класс, обеспечивающий thread-safe операции с файлами. Инициализируется в IoC-контейнере.
+ *
  * @author Kozlov Nikita
  */
 public class FileExecutor {
@@ -22,15 +24,12 @@ public class FileExecutor {
     private FileFactory fileFactory;
 
     /**
-     * Запись в файл. Thread-safe.
+     * Запись в файл. Thread-safe операция.
      */
     public synchronized void writeToFile(String content) throws IOException {
         logger.debug("[{}]: writeToFile({})", Thread.currentThread().getName(), content);
         BufferedWriter bufferedWriter = fileFactory.getBufferedWriter();
         bufferedWriter.write(content, 0, content.length());
         bufferedWriter.flush();
-        if (logger.isDebugEnabled()) {
-            int debugPoit = 1;
-        }
     }
 }

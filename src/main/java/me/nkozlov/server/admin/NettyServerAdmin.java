@@ -10,7 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * todo Document type NettyServerAdmin
+ * Основной контроллер, который может корректно запускать и останавливать сервер.
+ * Инициализируется в IoC-контейнере.
+ *
+ * @author Kozlov Nikita
+ * @see FileReadQueueAdmin
+ * @see SessionReadQueueAdmin
+ * @see ServerAdminInterface
  */
 public class NettyServerAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
 
@@ -44,12 +50,19 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Se
 
             threadNetty.start();
             logger.info("NettyServer was started.");
+            //            Устанавливаем состояние серверу "Запущен"
             this.nettyServer.setStarted(true);
         } else {
             logger.info("NettyServer is already running.");
         }
     }
 
+    /**
+     * Корректное завершение работы сервера и освобождение ресурсов, которые он использует.
+     *
+     * @see me.nkozlov.server.logic.file.FileReadQueueHandler
+     * @see me.nkozlov.server.logic.session.HttpSessionReadQueueHandler
+     */
     @Override
     public void stop() {
         if (this.nettyServer.isStarted()) {
@@ -58,6 +71,7 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Se
 
             sessionReadQueueAdmin.stop();
             fileReadQueueAdmin.stop();
+            //            Устанавливаем состояние серверу "Остановлен"
             this.nettyServer.setStarted(false);
             logger.info("NettyServer was stopped");
         } else {

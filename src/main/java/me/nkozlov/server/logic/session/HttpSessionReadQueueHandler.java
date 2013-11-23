@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 
 /**
  * @author Kozlov Nikita
- *         todo переместить файл в пакет ession, переименовать класс в HttpRequestSession
  */
 public final class HttpSessionReadQueueHandler extends AbstractReadQueue<HttpRequestSession> {
 

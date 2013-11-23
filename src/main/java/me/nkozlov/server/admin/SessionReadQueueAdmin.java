@@ -11,11 +11,17 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * todo Document type SessionReadQueueAdmin
+ * Основной контроллер, который запускает и останавливает обработчик очереди {@link HttpSessionReadQueueHandler}.
+ * Инициализируется в IoC-контейнере.
+ *
+ * @author Kozlov Nikita
+ * @see HttpSessionReadQueueHandler
+ * @see ServerAdminInterface
  */
 public class SessionReadQueueAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionReadQueueAdmin.class);
+
     private HttpSessionReadQueueHandler sessionReadQueueHandler;
 
     /**
@@ -28,7 +34,7 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
         if (this.sessionReadQueueHandler == null) {
             this.sessionReadQueueHandler = new HttpSessionReadQueueHandler(2);
             //        добавляем в ServerResources ссылку на обработчик очереди
-            this.serverResources.httpSessionReadQueueHandler(this.sessionReadQueueHandler);
+            this.serverResources.setHttpSessionReadQueueHandler(this.sessionReadQueueHandler);
         } else {
             logger.info("sessionReadQueueHandler is already running");
         }
@@ -47,5 +53,6 @@ public class SessionReadQueueAdmin extends AbstractServerAdminInterface implemen
         }
 
         sessionReadQueueHandler = null;
+        this.serverResources.setHttpSessionReadQueueHandler(null);
     }
 }

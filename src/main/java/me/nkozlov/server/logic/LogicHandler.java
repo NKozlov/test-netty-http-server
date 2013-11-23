@@ -5,7 +5,10 @@
 package me.nkozlov.server.logic;
 
 /**
+ * Интерфейс, предоставляющий API по обработке логики.
+ *
  * @author Kozlov Nikita
+ * @see NaturalSeqLogicHandler
  */
 public interface LogicHandler<V> {
 

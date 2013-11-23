@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
+ * Обработчик очередей. Содержит в себе реализацию очереди, а так же {@link ExecutorService}.
+ *
  * @author Kozlov Nikita
  */
 abstract public class AbstractReadQueue<E> implements Runnable {
