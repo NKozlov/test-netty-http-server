@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see SessionReadQueueAdmin
  * @see ServerAdminInterface
  */
-public class NettyServerAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
+public class NettyServerAdmin extends AbstractServerAdminInterface implements NettyServerAdminInterface {
 
     @Autowired
     private NettyServer nettyServer;
@@ -101,5 +101,10 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Se
             logger.info("{}", message);
             throw new NettyServerAlreadyStoppedException(message);
         }
+    }
+
+    @Override
+    public boolean checkStatus() {
+        return this.nettyServer.isStarted();
     }
 }

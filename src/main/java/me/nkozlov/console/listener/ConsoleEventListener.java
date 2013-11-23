@@ -34,7 +34,7 @@ public class ConsoleEventListener implements Runnable {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line = "";
         boolean exitFlag = false;
-
+        consoleEventHandler.printWelcomeMessage();
         // слушаем, пока exitFlag = false.
         while (!exitFlag) {
             try {
