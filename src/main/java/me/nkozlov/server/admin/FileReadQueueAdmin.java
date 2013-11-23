@@ -7,6 +7,7 @@ package me.nkozlov.server.admin;
 import me.nkozlov.server.logic.file.FileReadQueueHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +20,9 @@ import java.util.concurrent.TimeUnit;
  * @see ServerAdminInterface
  */
 public class FileReadQueueAdmin extends AbstractServerAdminInterface implements ServerAdminInterface {
+
+    @Autowired
+    ServerAdminInterface nettyServerAdmin;
 
     private static final Logger logger = LoggerFactory.getLogger(FileReadQueueAdmin.class);
     private FileReadQueueHandler fileReadQueueHandler;
@@ -45,9 +49,12 @@ public class FileReadQueueAdmin extends AbstractServerAdminInterface implements 
      */
     @Override
     public void stop() {
-        fileReadQueueHandler.getThreadPool().shutdown();
+        // прерываем выполнение и ставим флаг isShutdown.
+        fileReadQueueHandler.getThreadPool().shutdownNow();
+        logger.trace("Flag fileReadQueueHandler isShutdown = {}", fileReadQueueHandler.getThreadPool().isShutdown());
         try {
-            if (!fileReadQueueHandler.getThreadPool().awaitTermination(5, TimeUnit.SECONDS)) {
+            if (!fileReadQueueHandler.getThreadPool().awaitTermination(10, TimeUnit.SECONDS)) {
+                //повторно прерываем для окончательного завершения.
                 fileReadQueueHandler.getThreadPool().shutdownNow();
             }
         } catch (InterruptedException e) {

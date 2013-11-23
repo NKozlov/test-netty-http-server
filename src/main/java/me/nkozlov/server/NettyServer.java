@@ -14,9 +14,13 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import me.nkozlov.server.admin.ServerAdminInterface;
 import me.nkozlov.server.handlers.HttpRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Реализация запуска непосредственно netty-сервера, а так же его корректного завершения.
@@ -28,6 +32,9 @@ import org.slf4j.LoggerFactory;
 public class NettyServer implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+
+    @Autowired
+    private ServerAdminInterface nettyServerAdmin;
 
     private volatile ChannelFuture channelFuture;
     private int port;
@@ -83,6 +90,7 @@ public class NettyServer implements Runnable {
         isStarted = started;
     }
 
+    // synchronized(nettyServerAdmin)
     @Override
     public void run() {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -106,13 +114,18 @@ public class NettyServer implements Runnable {
 
             ChannelFuture f = networkServer.bind(port).sync();
             channelFuture = f;
+            // возвращаем управление консоли
+            synchronized (nettyServerAdmin) {
+                nettyServerAdmin.notifyAll();
+            }
+
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             logger.debug("Interrupt detected!!");
         } finally {
             logger.info("Shutdown server.");
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully().awaitUninterruptibly(10, TimeUnit.SECONDS);
+            bossGroup.shutdownGracefully().awaitUninterruptibly(10, TimeUnit.SECONDS);
         }
     }
 }

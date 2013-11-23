@@ -5,6 +5,8 @@
 package me.nkozlov.console;
 
 import me.nkozlov.server.admin.ServerAdminInterface;
+import me.nkozlov.server.admin.exceptions.NettyServerAlreadyStartedException;
+import me.nkozlov.server.admin.exceptions.NettyServerAlreadyStoppedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +50,21 @@ public class ConsoleEventHandler {
             case (COMMAND_QUIT):
                 return true;
             case (COMMAND_START):
-                nettyServerAdmin.start();
+                try {
+                    System.out.println("The server is started. Port: 80");
+                    nettyServerAdmin.start();
+                    System.out.println("The server was started successfully.");
+                } catch (NettyServerAlreadyStartedException e) {
+                    System.out.println(e.getMessage());
+                }
                 return false;
             case (COMMAND_STOP):
-                nettyServerAdmin.stop();
                 try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    //                    nothing
+                    System.out.println("Server begins its graceful shutdown.");
+                    nettyServerAdmin.stop();
+                    System.out.println("Server was stopped successfully.");
+                } catch (NettyServerAlreadyStoppedException e) {
+                    System.out.println(e.getMessage());
                 }
                 return false;
             default:
