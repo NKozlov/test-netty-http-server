@@ -39,7 +39,7 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
     }
 
     /**
-     * Инциализирует начальное значение из файла.
+     * Инциализирует начальное значение из файла. Происходит каждый раз при запуске сервера.
      */
     public void doInit() {
         BufferedReader bufferedReader = null;
