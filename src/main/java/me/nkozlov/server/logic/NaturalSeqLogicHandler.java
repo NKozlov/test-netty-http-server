@@ -48,6 +48,11 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
             bufferedReader = fileFactory.getBufferedReader();
             if (bufferedReader != null) {
                 content = bufferedReader.readLine();
+
+                // если файл новый и до этого не был создан
+                if (content == null) {
+                    content = "0";
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
