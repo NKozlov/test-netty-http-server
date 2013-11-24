@@ -7,6 +7,7 @@ package me.nkozlov.server.admin;
 import me.nkozlov.server.NettyServer;
 import me.nkozlov.server.admin.exceptions.NettyServerAlreadyStartedException;
 import me.nkozlov.server.admin.exceptions.NettyServerAlreadyStoppedException;
+import me.nkozlov.server.logic.LogicHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
     @Autowired
     ServerAdminInterface sessionReadQueueAdmin;
 
+    @Autowired
+    LogicHandler naturalSeqLogicHandler;
+
     private static final Logger logger = LoggerFactory.getLogger(NettyServerAdmin.class);
 
     /**
@@ -49,7 +53,7 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
             logger.debug("start()");
             fileReadQueueAdmin.start();
             sessionReadQueueAdmin.start();
-
+            naturalSeqLogicHandler.doInit();
             //инициализация параметров для запуска сервера (из файла config/netty-server-config.properties)
             int port = Integer.parseInt(this.nettyConfig.getProperty("netty.server.port"));
             this.nettyServer.setPort(port);

@@ -28,7 +28,6 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
 
     public NaturalSeqLogicHandler(FileFactory fileFactory) {
         this.fileFactory = fileFactory;
-        this.doInit();
     }
 
     /**
@@ -39,14 +38,10 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
         return atomNextValue.incrementAndGet();
     }
 
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
-
     /**
      * Инциализирует начальное значение из файла.
      */
-    private void doInit() {
+    public void doInit() {
         BufferedReader bufferedReader = null;
         String content = "";
         try {

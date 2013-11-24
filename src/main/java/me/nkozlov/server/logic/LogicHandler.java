@@ -13,4 +13,6 @@ package me.nkozlov.server.logic;
 public interface LogicHandler<V> {
 
     V executeLogic();
+
+    void doInit();
 }

@@ -81,7 +81,10 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         ctx.write(response).addListener(ChannelFutureListener.CLOSE);
         ctx.flush();
         logger.error("INTERNAL SERVER ERROR: <{}>", cause.getMessage());
-        cause.printStackTrace();
+        logger.error("{}", cause.getStackTrace());
+        if (logger.isTraceEnabled()) {
+            cause.printStackTrace();
+        }
         ctx.close();
     }
 }

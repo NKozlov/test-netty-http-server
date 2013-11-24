@@ -31,5 +31,6 @@ public class FileExecutor {
         BufferedWriter bufferedWriter = fileFactory.getBufferedWriter();
         bufferedWriter.write(content, 0, content.length());
         bufferedWriter.flush();
+        bufferedWriter.close();
     }
 }
