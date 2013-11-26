@@ -62,10 +62,14 @@ public class ConsoleEventHandler {
     public Boolean processEvent(String command) {
         command = this.parseCommand(command);
         logger.debug("Command input form console: <{}>", command);
-        CommandNames commandName = CommandNames.getFromString(command);
-        consoleCommandMap.get(commandName).apply();
-        //        todo command unknown
-        return commandName.equals(CommandNames.QUIT);
+        CommandNames commandName = null;
+        try {
+            commandName = CommandNames.getFromString(command);
+            consoleCommandMap.get(commandName).apply();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unknown command, please type help to get a list of available commands.");
+        }
+        return (commandName != null) && (commandName.equals(CommandNames.QUIT));
     }
 
     // ===================================================================================================================

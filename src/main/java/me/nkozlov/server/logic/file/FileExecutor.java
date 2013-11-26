@@ -28,9 +28,9 @@ public class FileExecutor {
      */
     public synchronized void writeToFile(String content) throws IOException {
         logger.debug("[{}]: writeToFile({})", Thread.currentThread().getName(), content);
-        BufferedWriter bufferedWriter = fileFactory.getBufferedWriter();
-        bufferedWriter.write(content, 0, content.length());
-        bufferedWriter.flush();
-        bufferedWriter.close();
+        try (BufferedWriter bufferedWriter = fileFactory.getBufferedWriter()) {
+            bufferedWriter.write(content, 0, content.length());
+            bufferedWriter.flush();
+        }
     }
 }

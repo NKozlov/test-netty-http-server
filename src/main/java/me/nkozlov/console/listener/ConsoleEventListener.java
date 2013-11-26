@@ -31,24 +31,18 @@ public class ConsoleEventListener implements Runnable {
 
     @Override
     public void run() {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
         String line = "";
         boolean exitFlag = false;
         consoleEventHandler.printWelcomeMessage();
-        // слушаем, пока exitFlag = false.
-        while (!exitFlag) {
-            try {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
+            // слушаем, пока exitFlag = false.
+            while (!exitFlag) {
+
                 System.out.print(">");
                 line = in.readLine();
-            } catch (IOException e) {
-                logger.error("[{}]: {}", Thread.currentThread().getName(), e.getMessage());
-                throw new RuntimeException(e);
+                exitFlag = consoleEventHandler.processEvent(line);
             }
-            exitFlag = consoleEventHandler.processEvent(line);
-        }
-
-        try {
-            in.close();
         } catch (IOException e) {
             logger.error("[{}]: {}", Thread.currentThread().getName(), e.getMessage());
             throw new RuntimeException(e);

@@ -42,10 +42,8 @@ public class NaturalSeqLogicHandler implements LogicHandler<Integer> {
      * Инциализирует начальное значение из файла. Происходит каждый раз при запуске сервера.
      */
     public void doInit() {
-        BufferedReader bufferedReader = null;
         String content = "";
-        try {
-            bufferedReader = fileFactory.getBufferedReader();
+        try (BufferedReader bufferedReader = fileFactory.getBufferedReader()) {
             if (bufferedReader != null) {
                 content = bufferedReader.readLine();
 
