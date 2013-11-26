@@ -46,9 +46,7 @@ public class Bootstrap {
         Thread threadConsoleListener = new Thread(consoleEventListener);
         threadConsoleListener.setName("ConsoleListener Thread");
 
-        //  сохраняем applicationContext в  статическом поле класса  ApplicationContextProvider для доступа к IoC из любой части приложения
-        applicationContext.getBean("applicationContextProvider", ApplicationContextProvider.class).setApplicationContext(applicationContext);
-
+        logger.debug("ApplicationContext = {}", ApplicationContextProvider.getApplicationContext());
         threadConsoleListener.start();
     }
 }

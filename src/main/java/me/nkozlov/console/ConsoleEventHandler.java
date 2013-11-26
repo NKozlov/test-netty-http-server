@@ -55,7 +55,7 @@ public class ConsoleEventHandler {
         this.welcomeMessage = new StringBuilder();
         this.welcomeMessage
                 .append("######################################################################################################################\n")
-                .append("###### == Welcome to the test http server, written Kozlova Nikita specifically only for the company ZeptoLab == ######\n")
+                .append("###### == Welcome to the test http server, written Kozlova Nikita == ######\n")
                 .append("## ~~~\n")
                 .append("## = Home page for this project here: https://github.com/NKozlov/test-netty-http-server\n")
                 .append("## = User manual here: https://github.com/NKozlov/test-netty-http-server/wiki/User-Manual\n")
