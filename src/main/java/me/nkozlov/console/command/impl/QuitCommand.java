@@ -8,7 +8,11 @@ import me.nkozlov.console.command.AbstractCommand;
 import me.nkozlov.console.command.RunCommand;
 
 /**
- * todo Document type QuitCommand
+ * Команда, которая осуществляет выход из консоли. Если сервер запущен, то вначале завершает его работу.
+ *
+ * @author Kozlov Nikita
+ * @see RunCommand
+ * @see AbstractCommand
  */
 public class QuitCommand extends AbstractCommand implements RunCommand {
     /**

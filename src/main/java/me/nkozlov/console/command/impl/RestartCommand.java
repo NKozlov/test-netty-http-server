@@ -8,7 +8,11 @@ import me.nkozlov.console.command.AbstractCommand;
 import me.nkozlov.console.command.RunCommand;
 
 /**
- * todo Document type RestartCommand
+ * Производит рестарт сервера, если он запущен.
+ *
+ * @author Kozlov Nikita
+ * @see RunCommand
+ * @see AbstractCommand
  */
 public class RestartCommand extends AbstractCommand implements RunCommand {
     /**

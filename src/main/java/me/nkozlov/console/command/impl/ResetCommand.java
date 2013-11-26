@@ -8,7 +8,11 @@ import me.nkozlov.console.command.AbstractCommand;
 import me.nkozlov.console.command.RunCommand;
 
 /**
- * todo Document type ResetCommand
+ * Команда, которая сбрасывает последовательность в 1.
+ *
+ * @author Kozlov Nikita
+ * @see RunCommand
+ * @see AbstractCommand
  */
 public class ResetCommand extends AbstractCommand implements RunCommand {
     /**

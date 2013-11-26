@@ -8,7 +8,11 @@ import me.nkozlov.console.command.AbstractCommand;
 import me.nkozlov.console.command.RunCommand;
 
 /**
- * todo Document type StartCommand
+ * Запускает сервер.
+ *
+ * @author Kozlov Nikita
+ * @see RunCommand
+ * @see AbstractCommand
  */
 public class StartCommand extends AbstractCommand implements RunCommand {
 

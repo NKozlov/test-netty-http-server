@@ -8,7 +8,11 @@ import me.nkozlov.console.command.AbstractCommand;
 import me.nkozlov.console.command.RunCommand;
 
 /**
- * todo Document type WelcomeCommand
+ * Выводит приветствие в консоль с описанием информации о проекте.
+ *
+ * @author Kozlov Nikita
+ * @see RunCommand
+ * @see AbstractCommand
  */
 public class WelcomeCommand extends AbstractCommand implements RunCommand {
     /**
