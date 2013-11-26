@@ -15,10 +15,16 @@ import me.nkozlov.console.command.RunCommand;
  * @see AbstractCommand
  */
 public class StopCommand extends AbstractCommand implements RunCommand {
+
+    public StopCommand() {
+        this.setCommandName("stop");
+    }
+
     /**
      * Метод, который отвечает за запуск команды.
      */
     @Override
     public void apply() {
+        this.doStopCommand();
     }
 }

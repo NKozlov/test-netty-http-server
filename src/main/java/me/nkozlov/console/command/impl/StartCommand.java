@@ -16,10 +16,15 @@ import me.nkozlov.console.command.RunCommand;
  */
 public class StartCommand extends AbstractCommand implements RunCommand {
 
+    public StartCommand() {
+        this.setCommandName("start");
+    }
+
     /**
      * Метод, который отвечает за запуск команды.
      */
     @Override
     public void apply() {
+        this.doStartCommand();
     }
 }

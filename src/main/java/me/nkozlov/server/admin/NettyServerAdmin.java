@@ -49,7 +49,7 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
      */
     @Override
     public void start() throws RuntimeException {
-        if (!this.nettyServer.isStarted()) {
+        if (!this.checkStatus()) {
             logger.debug("start()");
             fileReadQueueAdmin.start();
             sessionReadQueueAdmin.start();
@@ -100,7 +100,7 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
      */
     @Override
     public void stop() throws RuntimeException {
-        if (this.nettyServer.isStarted()) {
+        if (this.checkStatus()) {
             nettyServer.getChannelFuture().channel().close();
             nettyServer.getChannelFuture().awaitUninterruptibly();
 
@@ -118,6 +118,10 @@ public class NettyServerAdmin extends AbstractServerAdminInterface implements Ne
         }
     }
 
+   /**
+    * Проверяет статус сервера.
+    * @return true - запущен. false - не запущен.
+    * */
     @Override
     public boolean checkStatus() {
         return this.nettyServer.isStarted();

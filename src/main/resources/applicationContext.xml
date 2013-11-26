@@ -17,8 +17,32 @@
     <!-- Console beans -->
     <!-- =========================================================================================== -->
 
-    <bean name="consoleEventHandler" class="me.nkozlov.console.ConsoleEventHandler"/>
+    <bean name="consoleEventHandler" class="me.nkozlov.console.ConsoleEventHandler">
+        <constructor-arg>
+            <list>
+                <ref bean="helpCommand"/>
+                <ref bean="quitCommand"/>
+                <ref bean="resetCommand"/>
+                <ref bean="restartCommand"/>
+                <ref bean="startCommand"/>
+                <ref bean="stopCommand"/>
+                <ref bean="welcomeCommand"/>
+            </list>
+        </constructor-arg>
+    </bean>
     <bean name="consoleEventListener" class="me.nkozlov.console.listener.ConsoleEventListener"/>
+
+    <!-- =========================================================================================== -->
+    <!-- Console command beans -->
+    <!-- =========================================================================================== -->
+
+    <bean name="helpCommand" class="me.nkozlov.console.command.impl.HelpCommand"/>
+    <bean name="quitCommand" class="me.nkozlov.console.command.impl.QuitCommand"/>
+    <bean name="resetCommand" class="me.nkozlov.console.command.impl.ResetCommand"/>
+    <bean name="restartCommand" class="me.nkozlov.console.command.impl.RestartCommand"/>
+    <bean name="startCommand" class="me.nkozlov.console.command.impl.StartCommand"/>
+    <bean name="stopCommand" class="me.nkozlov.console.command.impl.StopCommand"/>
+    <bean name="welcomeCommand" class="me.nkozlov.console.command.impl.WelcomeCommand"/>
 
     <!-- =========================================================================================== -->
     <!-- Netty beans -->

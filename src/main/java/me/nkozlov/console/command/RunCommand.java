@@ -22,4 +22,10 @@ public interface RunCommand {
      * Метод, который отвечает за запуск команды.
      */
     void apply();
+
+    /**
+     * Возвращает имя команды.
+     * @return String - имя команды.
+     * */
+    String getCommandName();
 }

@@ -15,10 +15,19 @@ import me.nkozlov.console.command.RunCommand;
  * @see AbstractCommand
  */
 public class QuitCommand extends AbstractCommand implements RunCommand {
+
+    public QuitCommand() {
+        this.setCommandName("quit");
+    }
+
     /**
      * Метод, который отвечает за запуск команды.
      */
     @Override
     public void apply() {
+        if (this.nettyServerAdmin.checkStatus()) {
+            this.doStopCommand();
+        }
+        System.out.println("Bye bye, see u :)");
     }
 }
